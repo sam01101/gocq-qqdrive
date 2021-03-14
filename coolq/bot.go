@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"runtime/debug"
-	"sync"
 	"time"
 
 	"github.com/Mrs4s/MiraiGo/binary"
@@ -29,11 +28,8 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 type CQBot struct {
 	Client *client.QQClient
 
-	events         []func(MSG)
-	db             *leveldb.DB
-	friendReqCache sync.Map
-	tempMsgCache   sync.Map
-	oneWayMsgCache sync.Map
+	events []func(MSG)
+	db     *leveldb.DB
 }
 
 // MSG 消息Map
@@ -179,76 +175,6 @@ func (bot *CQBot) dispatchEventMessage(m MSG) {
 			}
 		}(f)
 	}
-}
-
-func (bot *CQBot) formatGroupMessage(m *message.GroupMessage) MSG {
-	cqm := ToStringMessage(m.Elements, m.GroupCode, true)
-	gm := MSG{
-		"anonymous":    nil,
-		"font":         0,
-		"group_id":     m.GroupCode,
-		"message":      ToFormattedMessage(m.Elements, m.GroupCode, false),
-		"message_type": "group",
-		"message_seq":  m.Id,
-		"post_type": func() string {
-			if m.Sender.Uin == bot.Client.Uin {
-				return "message_sent"
-			}
-			return "message"
-		}(),
-		"raw_message": cqm,
-		"self_id":     bot.Client.Uin,
-		"sender": MSG{
-			"age":     0,
-			"area":    "",
-			"level":   "",
-			"sex":     "unknown",
-			"user_id": m.Sender.Uin,
-		},
-		"sub_type": "normal",
-		"time":     time.Now().Unix(),
-		"user_id":  m.Sender.Uin,
-	}
-	if m.Sender.IsAnonymous() {
-		gm["anonymous"] = MSG{
-			"flag": m.Sender.AnonymousInfo.AnonymousId + "|" + m.Sender.AnonymousInfo.AnonymousNick,
-			"id":   m.Sender.Uin,
-			"name": m.Sender.AnonymousInfo.AnonymousNick,
-		}
-		gm["sender"].(MSG)["nickname"] = "匿名消息"
-		gm["sub_type"] = "anonymous"
-	} else {
-		group := bot.Client.FindGroup(m.GroupCode)
-		mem := group.FindMember(m.Sender.Uin)
-		if mem == nil {
-			log.Warnf("获取 %v 成员信息失败，尝试刷新成员列表", m.Sender.Uin)
-			t, err := bot.Client.GetGroupMembers(group)
-			if err != nil {
-				log.Warnf("刷新群 %v 成员列表失败: %v", group.Uin, err)
-				return nil
-			}
-			group.Members = t
-			mem = group.FindMember(m.Sender.Uin)
-			if mem == nil {
-				return nil
-			}
-		}
-		ms := gm["sender"].(MSG)
-		ms["role"] = func() string {
-			switch mem.Permission {
-			case client.Owner:
-				return "owner"
-			case client.Administrator:
-				return "admin"
-			default:
-				return "member"
-			}
-		}()
-		ms["nickname"] = mem.Nickname
-		ms["card"] = mem.CardName
-		ms["title"] = mem.SpecialTitle
-	}
-	return gm
 }
 
 // ToJSON 生成JSON字符串
