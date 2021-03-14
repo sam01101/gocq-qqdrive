@@ -2,11 +2,9 @@ package global
 
 import (
 	"fmt"
-	"io/ioutil"
 	"regexp"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -292,21 +290,3 @@ func Generate(opName string, argument gjson.Result) Filter {
 
 // EventFilter 初始化一个nil过滤器
 var EventFilter Filter
-
-// BootFilter 启动事件过滤器
-func BootFilter() {
-	defer func() {
-		if e := recover(); e != nil {
-			log.Warnf("事件过滤器启动失败: %v", e)
-			EventFilter = nil
-		} else {
-			log.Info("事件过滤器启动成功.")
-		}
-	}()
-	f, err := ioutil.ReadFile("filter.json")
-	if err != nil {
-		panic(err)
-	} else {
-		EventFilter = Generate("and", gjson.ParseBytes(f))
-	}
-}

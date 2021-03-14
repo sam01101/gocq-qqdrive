@@ -161,7 +161,7 @@ func (bot *CQBot) CQSendGroupForwardMessage(groupID int64, m gjson.Result) MSG {
 			return Failed(100, "SEND_MSG_API_ERROR", "请参考输出")
 		}
 		return OK(MSG{
-			"message_id": bot.InsertGroupMessage(ret),
+			"message_id": ret.Elements[0].(*message.ForwardElement).ResId,
 		})
 	}
 	return Failed(100)
