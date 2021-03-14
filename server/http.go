@@ -151,9 +151,6 @@ func (c *httpClient) onBotPushEvent(m coolq.MSG) {
 		return
 	}
 	log.Debugf("上报Event数据 %v 到 %v", m.ToJSON(), c.addr)
-	if gjson.Valid(res) {
-		c.bot.CQHandleQuickOperation(gjson.Parse(m.ToJSON()), gjson.Parse(res))
-	}
 }
 
 func (s *httpServer) HandleActions(c *gin.Context) {

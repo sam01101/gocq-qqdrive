@@ -14,10 +14,6 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // DefaultConfigWithComments 为go-cqhttp的默认配置文件
 var DefaultConfigWithComments = `
-/*
-    go-cqhttp 默认配置文件
-*/
-
 {
     // QQ号
     uin: 0

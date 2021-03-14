@@ -47,42 +47,6 @@ func NewQQBot(cli *client.QQClient, conf *global.JSONConfig) *CQBot {
 	bot := &CQBot{
 		Client: cli,
 	}
-	if conf.EnableDB {
-		p := path.Join("data", "leveldb")
-		db, err := leveldb.OpenFile(p, nil)
-		if err != nil {
-			log.Fatalf("打开数据库失败, 如果频繁遇到此问题请清理 data/leveldb 文件夹或关闭数据库功能。")
-		}
-		bot.db = db
-		gob.Register(message.Sender{})
-		log.Info("信息数据库初始化完成.")
-	} else {
-		log.Warn("警告: 信息数据库已关闭，将无法使用 [回复/撤回] 等功能。")
-	}
-	bot.Client.OnPrivateMessage(bot.privateMessageEvent)
-	bot.Client.OnGroupMessage(bot.groupMessageEvent)
-	if conf.EnableSelfMessage {
-		bot.Client.OnSelfGroupMessage(bot.groupMessageEvent)
-	}
-	bot.Client.OnTempMessage(bot.tempMessageEvent)
-	bot.Client.OnGroupMuted(bot.groupMutedEvent)
-	bot.Client.OnGroupMessageRecalled(bot.groupRecallEvent)
-	bot.Client.OnGroupNotify(bot.groupNotifyEvent)
-	bot.Client.OnFriendNotify(bot.friendNotifyEvent)
-	bot.Client.OnFriendMessageRecalled(bot.friendRecallEvent)
-	bot.Client.OnReceivedOfflineFile(bot.offlineFileEvent)
-	bot.Client.OnJoinGroup(bot.joinGroupEvent)
-	bot.Client.OnLeaveGroup(bot.leaveGroupEvent)
-	bot.Client.OnGroupMemberJoined(bot.memberJoinEvent)
-	bot.Client.OnGroupMemberLeaved(bot.memberLeaveEvent)
-	bot.Client.OnGroupMemberPermissionChanged(bot.memberPermissionChangedEvent)
-	bot.Client.OnGroupMemberCardUpdated(bot.memberCardUpdatedEvent)
-	bot.Client.OnNewFriendRequest(bot.friendRequestEvent)
-	bot.Client.OnNewFriendAdded(bot.friendAddedEvent)
-	bot.Client.OnGroupInvited(bot.groupInvitedEvent)
-	bot.Client.OnUserWantJoinGroup(bot.groupJoinReqEvent)
-	bot.Client.OnOtherClientStatusChanged(bot.otherClientStatusChangedEvent)
-	bot.Client.OnGroupDigest(bot.groupEssenceMsg)
 	go func() {
 		i := conf.HeartbeatInterval
 		if i < 0 {
@@ -99,7 +63,6 @@ func NewQQBot(cli *client.QQClient, conf *global.JSONConfig) *CQBot {
 				"self_id":         bot.Client.Uin,
 				"post_type":       "meta_event",
 				"meta_event_type": "heartbeat",
-				"status":          bot.CQGetStatus()["data"],
 				"interval":        1000 * i,
 			})
 		}
@@ -110,32 +73,6 @@ func NewQQBot(cli *client.QQClient, conf *global.JSONConfig) *CQBot {
 // OnEventPush 注册事件上报函数
 func (bot *CQBot) OnEventPush(f func(m MSG)) {
 	bot.events = append(bot.events, f)
-}
-
-// GetMessage 获取给定消息id对应的消息
-func (bot *CQBot) GetMessage(mid int32) MSG {
-	if bot.db != nil {
-		m := MSG{}
-		data, err := bot.db.Get(binary.ToBytes(mid), nil)
-		if err == nil {
-			buff := new(bytes.Buffer)
-			buff.Write(binary.GZipUncompress(data))
-			err = gob.NewDecoder(buff).Decode(&m)
-			if err == nil {
-				return m
-			}
-		}
-		log.Warnf("获取信息时出现错误: %v id: %v", err, mid)
-	}
-	return nil
-}
-
-// UploadLocalImageAsGroup 上传本地图片至群聊
-func (bot *CQBot) UploadLocalImageAsGroup(groupCode int64, img *LocalImageElement) (*message.GroupImageElement, error) {
-	if img.Stream != nil {
-		return bot.Client.UploadGroupImage(groupCode, img.Stream)
-	}
-	return bot.Client.UploadGroupImageByFile(groupCode, img.File)
 }
 
 // UploadLocalVideo 上传本地短视频至群聊
@@ -155,74 +92,17 @@ func (bot *CQBot) UploadLocalVideo(target int64, v *LocalVideoElement) (*message
 	return &v.ShortVideoElement, nil
 }
 
-// UploadLocalImageAsPrivate 上传本地图片至私聊
-func (bot *CQBot) UploadLocalImageAsPrivate(userID int64, img *LocalImageElement) (*message.FriendImageElement, error) {
-	if img.Stream != nil {
-		return bot.Client.UploadPrivateImage(userID, img.Stream)
-	}
-	// need update.
-	f, err := os.Open(img.File)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return bot.Client.UploadPrivateImage(userID, f)
-}
-
 // SendGroupMessage 发送群消息
 func (bot *CQBot) SendGroupMessage(groupID int64, m *message.SendingMessage) int32 {
 	var newElem []message.IMessageElement
-	group := bot.Client.FindGroup(groupID)
 	for _, elem := range m.Elements {
-		if i, ok := elem.(*LocalImageElement); ok {
-			gm, err := bot.UploadLocalImageAsGroup(groupID, i)
-			if err != nil {
-				log.Warnf("警告: 群 %v 消息图片上传失败: %v", groupID, err)
-				continue
-			}
-			newElem = append(newElem, gm)
-			continue
-		}
-		if i, ok := elem.(*message.VoiceElement); ok {
-			gv, err := bot.Client.UploadGroupPtt(groupID, bytes.NewReader(i.Data))
-			if err != nil {
-				log.Warnf("警告: 群 %v 消息语音上传失败: %v", groupID, err)
-				continue
-			}
-			newElem = append(newElem, gv)
-			continue
-		}
 		if i, ok := elem.(*LocalVideoElement); ok {
-			gv, err := bot.UploadLocalVideo(groupID, i)
+			gv, err := bot.UploadLocalVideo(0, i)
 			if err != nil {
 				log.Warnf("警告: 群 %v 消息短视频上传失败: %v", groupID, err)
 				continue
 			}
 			newElem = append(newElem, gv)
-			continue
-		}
-		if i, ok := elem.(*PokeElement); ok {
-			if group := bot.Client.FindGroup(groupID); group != nil {
-				if mem := group.FindMember(i.Target); mem != nil {
-					mem.Poke()
-					return 0
-				}
-			}
-		}
-		if i, ok := elem.(*GiftElement); ok {
-			bot.Client.SendGroupGift(uint64(groupID), uint64(i.Target), i.GiftID)
-			return 0
-		}
-		if i, ok := elem.(*message.MusicShareElement); ok {
-			ret, err := bot.Client.SendGroupMusicShare(groupID, i)
-			if err != nil {
-				log.Warnf("警告: 群 %v 富文本消息发送失败: %v", groupID, err)
-				return -1
-			}
-			return bot.InsertGroupMessage(ret)
-		}
-		if i, ok := elem.(*message.AtElement); ok && i.Target == 0 && group.SelfPermission() == client.Member {
-			newElem = append(newElem, message.NewText("@全体成员"))
 			continue
 		}
 		newElem = append(newElem, elem)
@@ -232,100 +112,13 @@ func (bot *CQBot) SendGroupMessage(groupID int64, m *message.SendingMessage) int
 		return -1
 	}
 	m.Elements = newElem
-	bot.checkMedia(newElem)
+	//bot.checkMedia(newElem)
 	ret := bot.Client.SendGroupMessage(groupID, m, ForceFragmented)
 	if ret == nil || ret.Id == -1 {
 		log.Warnf("群消息发送失败: 账号可能被风控.")
 		return -1
 	}
 	return bot.InsertGroupMessage(ret)
-}
-
-// SendPrivateMessage 发送私聊消息
-func (bot *CQBot) SendPrivateMessage(target int64, groupId int64, m *message.SendingMessage) int32 {
-	var newElem []message.IMessageElement
-	for _, elem := range m.Elements {
-		if i, ok := elem.(*LocalImageElement); ok {
-			fm, err := bot.UploadLocalImageAsPrivate(target, i)
-			if err != nil {
-				log.Warnf("警告: 私聊 %v 消息图片上传失败.", target)
-				continue
-			}
-			newElem = append(newElem, fm)
-			continue
-		}
-		if i, ok := elem.(*PokeElement); ok {
-			bot.Client.SendFriendPoke(i.Target)
-			return 0
-		}
-		if i, ok := elem.(*message.VoiceElement); ok {
-			fv, err := bot.Client.UploadPrivatePtt(target, i.Data)
-			if err != nil {
-				log.Warnf("警告: 私聊 %v 消息语音上传失败: %v", target, err)
-				continue
-			}
-			newElem = append(newElem, fv)
-			continue
-		}
-		if i, ok := elem.(*LocalVideoElement); ok {
-			gv, err := bot.UploadLocalVideo(target, i)
-			if err != nil {
-				log.Warnf("警告: 私聊 %v 消息短视频上传失败: %v", target, err)
-				continue
-			}
-			newElem = append(newElem, gv)
-			continue
-		}
-		if i, ok := elem.(*message.MusicShareElement); ok {
-			bot.Client.SendFriendMusicShare(target, i)
-			return 0
-		}
-		newElem = append(newElem, elem)
-	}
-	if len(newElem) == 0 {
-		log.Warnf("好友消息发送失败: 消息为空.")
-		return -1
-	}
-	m.Elements = newElem
-	bot.checkMedia(newElem)
-	var id int32 = -1
-	if bot.Client.FindFriend(target) != nil { // 双向好友
-		msg := bot.Client.SendPrivateMessage(target, m)
-		if msg != nil {
-			id = bot.InsertPrivateMessage(msg)
-		}
-	} else if code, ok := bot.tempMsgCache.Load(target); ok || groupId != 0 { // 临时会话
-		if groupId != 0 && !bot.Client.FindGroup(groupId).AdministratorOrOwner() {
-			log.Errorf("错误: 机器人在群(%v) 为非管理员或群主, 无法主动发起临时会话", groupId)
-			id = -1
-		} else if groupId != 0 && bot.Client.FindGroup(groupId).FindMember(target) == nil {
-			log.Errorf("错误: 群员(%v) 不在 群(%v), 无法发起临时会话", target, groupId)
-			id = -1
-		} else {
-			if code != nil {
-				groupId = code.(int64)
-			}
-			msg := bot.Client.SendTempMessage(groupId, target, m)
-			if msg != nil {
-				id = bot.InsertTempMessage(target, msg)
-			}
-		}
-	} else if _, ok := bot.oneWayMsgCache.Load(target); ok { // 单向好友
-		msg := bot.Client.SendPrivateMessage(target, m)
-		if msg != nil {
-			id = bot.InsertPrivateMessage(msg)
-		}
-	} else {
-		nickname := "Unknown"
-		if summaryInfo, _ := bot.Client.GetSummaryInfo(target); summaryInfo != nil {
-			nickname = summaryInfo.Nickname
-		}
-		log.Errorf("错误: 请先添加 %v(%v) 为好友", nickname, target)
-	}
-	if id == -1 {
-		return -1
-	}
-	return id
 }
 
 // InsertGroupMessage 群聊消息入数据库
@@ -340,58 +133,6 @@ func (bot *CQBot) InsertGroupMessage(m *message.GroupMessage) int32 {
 		"message":     ToStringMessage(m.Elements, m.GroupCode, true),
 	}
 	id := toGlobalID(m.GroupCode, m.Id)
-	if bot.db != nil {
-		buf := new(bytes.Buffer)
-		if err := gob.NewEncoder(buf).Encode(val); err != nil {
-			log.Warnf("记录聊天数据时出现错误: %v", err)
-			return -1
-		}
-		if err := bot.db.Put(binary.ToBytes(id), binary.GZipCompress(buf.Bytes()), nil); err != nil {
-			log.Warnf("记录聊天数据时出现错误: %v", err)
-			return -1
-		}
-	}
-	return id
-}
-
-// InsertPrivateMessage 私聊消息入数据库
-func (bot *CQBot) InsertPrivateMessage(m *message.PrivateMessage) int32 {
-	val := MSG{
-		"message-id":  m.Id,
-		"internal-id": m.InternalId,
-		"target":      m.Target,
-		"sender":      m.Sender,
-		"time":        m.Time,
-		"message":     ToStringMessage(m.Elements, m.Sender.Uin, true),
-	}
-	id := toGlobalID(m.Sender.Uin, m.Id)
-	if bot.db != nil {
-		buf := new(bytes.Buffer)
-		if err := gob.NewEncoder(buf).Encode(val); err != nil {
-			log.Warnf("记录聊天数据时出现错误: %v", err)
-			return -1
-		}
-		if err := bot.db.Put(binary.ToBytes(id), binary.GZipCompress(buf.Bytes()), nil); err != nil {
-			log.Warnf("记录聊天数据时出现错误: %v", err)
-			return -1
-		}
-	}
-	return id
-}
-
-// InsertTempMessage 临时消息入数据库
-func (bot *CQBot) InsertTempMessage(target int64, m *message.TempMessage) int32 {
-	val := MSG{
-		"message-id": m.Id,
-		// FIXME(InsertTempMessage) InternalId missing
-		"group":      m.GroupCode,
-		"group-name": m.GroupName,
-		"target":     target,
-		"sender":     m.Sender,
-		"time":       time.Now().Unix(),
-		"message":    ToStringMessage(m.Elements, m.Sender.Uin, true),
-	}
-	id := toGlobalID(m.Sender.Uin, m.Id)
 	if bot.db != nil {
 		buf := new(bytes.Buffer)
 		if err := gob.NewEncoder(buf).Encode(val); err != nil {
@@ -508,17 +249,6 @@ func (bot *CQBot) formatGroupMessage(m *message.GroupMessage) MSG {
 		ms["title"] = mem.SpecialTitle
 	}
 	return gm
-}
-
-func formatGroupName(group *client.GroupInfo) string {
-	return fmt.Sprintf("%s(%d)", group.Name, group.Code)
-}
-
-func formatMemberName(mem *client.GroupMemberInfo) string {
-	if mem == nil {
-		return "未知"
-	}
-	return fmt.Sprintf("%s(%d)", mem.DisplayName(), mem.Uin)
 }
 
 // ToJSON 生成JSON字符串

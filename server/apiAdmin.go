@@ -316,9 +316,6 @@ func (s *webServer) Dologin() {
 	s.Cli.AllowSlider = true
 	s.logincore(false)
 	log.Infof("登录成功 欢迎使用: %v", s.Cli.Nickname)
-	log.Info("开始加载好友列表...")
-	global.Check(s.Cli.ReloadFriendList())
-	log.Infof("共加载 %v 个好友.", len(s.Cli.FriendList))
 	log.Infof("开始加载群列表...")
 	global.Check(s.Cli.ReloadGroupList())
 	log.Infof("共加载 %v 个群.", len(s.Cli.GroupList))
@@ -332,8 +329,6 @@ func (s *webServer) Dologin() {
 	if s.Conf.RateLimit.Enabled {
 		global.InitLimiter(s.Conf.RateLimit.Frequency, s.Conf.RateLimit.BucketSize)
 	}
-	log.Info("正在加载事件过滤器.")
-	global.BootFilter()
 	coolq.IgnoreInvalidCQCode = s.Conf.IgnoreInvalidCQCode
 	coolq.SplitURL = s.Conf.FixURL
 	coolq.ForceFragmented = s.Conf.ForceFragmented

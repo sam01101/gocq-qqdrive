@@ -1,33 +1,9 @@
 package global
 
 import (
-	"crypto/md5"
-	"fmt"
-	"io/ioutil"
-	"os/exec"
-	"path"
-
-	"github.com/Mrs4s/go-cqhttp/global/codec"
 	"github.com/pkg/errors"
+	"os/exec"
 )
-
-// EncoderSilk 将音频编码为Silk
-func EncoderSilk(data []byte) ([]byte, error) {
-	h := md5.New()
-	_, err := h.Write(data)
-	if err != nil {
-		return nil, errors.Wrap(err, "calc md5 failed")
-	}
-	tempName := fmt.Sprintf("%x", h.Sum(nil))
-	if silkPath := path.Join("data/cache", tempName+".silk"); PathExists(silkPath) {
-		return ioutil.ReadFile(silkPath)
-	}
-	slk, err := codec.EncodeToSilk(data, tempName, true)
-	if err != nil {
-		return nil, errors.Wrap(err, "encode silk failed")
-	}
-	return slk, nil
-}
 
 // EncodeMP4 将给定视频文件编码为MP4
 func EncodeMP4(src string, dst string) error { //        -y 覆盖文件

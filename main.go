@@ -96,16 +96,6 @@ func init() {
 		_ = os.Remove("cqhttp.json")
 	}
 
-	if !global.PathExists(global.ImagePath) {
-		if err := os.MkdirAll(global.ImagePath, 0755); err != nil {
-			log.Fatalf("创建图片缓存文件夹失败: %v", err)
-		}
-	}
-	if !global.PathExists(global.VoicePath) {
-		if err := os.MkdirAll(global.VoicePath, 0755); err != nil {
-			log.Fatalf("创建语音缓存文件夹失败: %v", err)
-		}
-	}
 	if !global.PathExists(global.VideoPath) {
 		if err := os.MkdirAll(global.VideoPath, 0755); err != nil {
 			log.Fatalf("创建视频缓存文件夹失败: %v", err)
@@ -113,7 +103,7 @@ func init() {
 	}
 	if !global.PathExists(global.CachePath) {
 		if err := os.MkdirAll(global.CachePath, 0755); err != nil {
-			log.Fatalf("创建发送图片缓存文件夹失败: %v", err)
+			log.Fatalf("创建缓存文件夹失败: %v", err)
 		}
 	}
 }
@@ -142,8 +132,8 @@ func main() {
 	}
 	if terminal.RunningByDoubleClick() && !isFastStart {
 		log.Warning("警告: 强烈不推荐通过双击直接运行本程序, 这将导致一些非预料的后果.")
-		log.Warning("将等待10s后启动")
-		time.Sleep(time.Second * 10)
+		//log.Warning("将等待10s后启动")
+		//time.Sleep(time.Second * 10)
 	}
 	if conf.Uin == 0 || (conf.Password == "" && conf.PasswordEncrypted == "") {
 		log.Warnf("请修改 config.hjson 以添加账号密码.")
@@ -285,7 +275,6 @@ func main() {
 	b := server.WebServer.Run(fmt.Sprintf("%s:%d", conf.WebUI.Host, conf.WebUI.WebUIPort), cli)
 	c := server.Console
 	r := server.Restart
-	go checkUpdate()
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	select {
 	case <-c:
@@ -345,30 +334,6 @@ func OldPasswordDecrypt(encryptedPassword string, key []byte) string {
 		panic("密钥错误")
 	}
 	return string(tea.Decrypt(encrypted))
-}
-
-func checkUpdate() {
-	log.Infof("正在检查更新.")
-	if coolq.Version == "unknown" {
-		log.Warnf("检查更新失败: 使用的 Actions 测试版或自编译版本.")
-		return
-	}
-	var res string
-	if err := gout.GET("https://api.github.com/repos/Mrs4s/go-cqhttp/releases").BindBody(&res).Do(); err != nil {
-		log.Warnf("检查更新失败: %v", err)
-		return
-	}
-	detail := gjson.Parse(res)
-	if len(detail.Array()) < 1 {
-		return
-	}
-	info := detail.Array()[0]
-	if global.VersionNameCompare(coolq.Version, info.Get("tag_name").Str) {
-		log.Infof("当前有更新的 go-cqhttp 可供更新, 请前往 https://github.com/Mrs4s/go-cqhttp/releases 下载.")
-		log.Infof("当前版本: %v 最新版本: %v", coolq.Version, info.Get("tag_name").Str)
-		return
-	}
-	log.Infof("检查更新完成. 当前已运行最新版本.")
 }
 
 func selfUpdate(imageURL string) {
@@ -449,11 +414,11 @@ func restart(Args []string) {
 			log.Errorf("重启失败:%s", err.Error())
 			return
 		}
-		path, err := filepath.Abs(file)
+		pathLoc, err := filepath.Abs(file)
 		if err != nil {
 			log.Errorf("重启失败:%s", err.Error())
 		}
-		Args = append([]string{"/c", "start ", path, "faststart"}, Args[1:]...)
+		Args = append([]string{"/c", "start ", pathLoc, "faststart"}, Args[1:]...)
 		cmd = &exec.Cmd{
 			Path:   "cmd.exe",
 			Args:   Args,
