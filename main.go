@@ -352,7 +352,7 @@ func selfUpdate(imageURL string) {
 		doUpdate := func() {
 			log.Info("正在更新,请稍等...")
 			url := fmt.Sprintf(
-				"%v/Mrs4s/go-cqhttp/releases/download/%v/go-cqhttp-%v-%v-%v",
+				"%v/sam01101/gocq-qqdrive/releases/download/%v/go-cqhttp-%v-%v-%v",
 				func() string {
 					if imageURL != "" {
 						return imageURL
