@@ -62,7 +62,7 @@ func (bot *CQBot) OnEventPush(f func(m MSG)) {
 }
 
 // UploadLocalVideo 上传本地短视频至群聊
-func (bot *CQBot) UploadLocalVideo(target int64, v *LocalVideoElement) (*message.ShortVideoElement, error) {
+func (bot *CQBot) UploadLocalVideo(v *LocalVideoElement) (*message.ShortVideoElement, error) {
 	if v.File != "" {
 		video, err := os.Open(v.File)
 		if err != nil {
@@ -73,7 +73,7 @@ func (bot *CQBot) UploadLocalVideo(target int64, v *LocalVideoElement) (*message
 		cacheFile := path.Join(global.CachePath, hex.EncodeToString(hash[:])+".cache")
 		_, _ = video.Seek(0, io.SeekStart)
 		_, _ = v.thumb.Seek(0, io.SeekStart)
-		return bot.Client.UploadGroupShortVideo(target, video, v.thumb, cacheFile)
+		return bot.Client.UploadGroupShortVideo(0, video, v.thumb, cacheFile)
 	}
 	return &v.ShortVideoElement, nil
 }

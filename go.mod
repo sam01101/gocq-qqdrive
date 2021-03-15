@@ -10,13 +10,14 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/guonaihong/gout v0.1.5
 	github.com/hjson/hjson-go v3.1.0+incompatible
+	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.10
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315005315-55aef1b0ffd0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
 	github.com/tidwall/gjson v1.6.8
@@ -24,8 +25,12 @@ require (
 	github.com/ugorji/go v1.2.4 // indirect
 	github.com/yinghau76/go-ascii-art v0.0.0-20190517192627-e7f465a30189
 	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b
-	golang.org/x/sys v0.0.0-20210314195730-07df6a141424 // indirect
+	golang.org/x/sys v0.0.0-20210315160823-c6e025ad8005 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+)
+
+replace (
+	github.com/sam01101/MiraiGo-qdrive => D:\MiraiGo-qdrive
 )

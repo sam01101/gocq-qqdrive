@@ -35,7 +35,7 @@ func (bot *CQBot) CQUploadShortVideo(filePath string) MSG {
 		File:  filePath,
 		thumb: bytes.NewReader(data),
 	}
-	gv, err := bot.UploadLocalVideo(0, &shortVideoElem)
+	gv, err := bot.UploadLocalVideo(&shortVideoElem)
 	if err != nil {
 		log.Warnf("警告: 短视频上传失败: %v", err)
 		return Failed(100, "SHORT_VIDEO_UPLOAD_FAILED", err.Error())
@@ -79,7 +79,7 @@ func (bot *CQBot) CQDownloadFile(url string, headers map[string]string, threadCo
 // CQSendGroupForwardMessage 扩展API-发送合并转发(群)
 //
 // https://docs.go-cqhttp.org/api/#%E5%8F%91%E9%80%81%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91-%E7%BE%A4
-func (bot *CQBot) CQSendGroupForwardMessage(groupID int64, m gjson.Result) MSG {
+func (bot *CQBot) CQSendGroupForwardMessage(m gjson.Result) MSG {
 	if m.Type != gjson.JSON {
 		return Failed(100)
 	}
@@ -116,7 +116,7 @@ func (bot *CQBot) CQSendGroupForwardMessage(groupID int64, m gjson.Result) MSG {
 					SenderId:   uin,
 					SenderName: name,
 					Time:       int32(msgTime),
-					Message:    []message.IMessageElement{bot.Client.UploadGroupForwardMessage(groupID, &message.ForwardMessage{Nodes: taowa})},
+					Message:    []message.IMessageElement{bot.Client.UploadForwardMessage(&message.ForwardMessage{Nodes: sendNodes})},
 				})
 				return
 			}
@@ -126,9 +126,9 @@ func (bot *CQBot) CQSendGroupForwardMessage(groupID int64, m gjson.Result) MSG {
 			var newElem []message.IMessageElement
 			for _, elem := range content {
 				if video, ok := elem.(*LocalVideoElement); ok {
-					gm, err := bot.UploadLocalVideo(groupID, video)
+					gm, err := bot.UploadLocalVideo(video)
 					if err != nil {
-						log.Warnf("警告：群 %v 视频上传失败: %v", groupID, err)
+						log.Warnf("警告：视频上传失败: %v", err)
 						continue
 					}
 					newElem = append(newElem, gm)
@@ -155,17 +155,19 @@ func (bot *CQBot) CQSendGroupForwardMessage(groupID int64, m gjson.Result) MSG {
 		sendNodes = convert(m)
 	}
 	if len(sendNodes) > 0 {
-		ret := bot.Client.SendGroupForwardMessage(groupID, &message.ForwardMessage{Nodes: sendNodes})
-		if ret == nil || ret.Id == -1 {
+		ret := bot.Client.UploadForwardMessage(&message.ForwardMessage{Nodes: sendNodes})
+		if ret == nil {
 			log.Warnf("合并转发(群)消息发送失败: 账号可能被风控.")
 			return Failed(100, "SEND_MSG_API_ERROR", "请参考输出")
 		}
 		return OK(MSG{
-			"message_id": ret.Elements[0].(*message.ForwardElement).ResId,
+			"message_id": ret.ResId,
 		})
 	}
 	return Failed(100)
 }
+
+
 
 // CQGetForwardMessage 获取合并转发消息
 //
@@ -177,13 +179,11 @@ func (bot *CQBot) CQGetForwardMessage(resID string) MSG {
 	}
 	r := make([]MSG, 0)
 	for _, n := range m.Nodes {
-		bot.checkMedia(n.Message)
+		bot.checkMedia(n.Message, true)
 		r = append(r, MSG{
 			"sender": MSG{
 				"user_id":  n.SenderId,
-				"nickname": n.SenderName,
 			},
-			"time":    n.Time,
 			"content": ToFormattedMessage(n.Message, false),
 		})
 	}

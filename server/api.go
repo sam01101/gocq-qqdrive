@@ -23,7 +23,7 @@ func uploadShortVideo(bot *coolq.CQBot, p resultGetter) coolq.MSG {
 }
 
 func sendGroupForwardMSG(bot *coolq.CQBot, p resultGetter) coolq.MSG {
-	return bot.CQSendGroupForwardMessage(p.Get("group_id").Int(), p.Get("messages"))
+	return bot.CQSendGroupForwardMessage(p.Get("messages"))
 }
 
 func getForwardMSG(bot *coolq.CQBot, p resultGetter) coolq.MSG {

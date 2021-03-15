@@ -16,22 +16,24 @@ func SetMessageFormat(f string) {
 	format = f
 }
 
-func (bot *CQBot) checkMedia(e []message.IMessageElement) {
+func (bot *CQBot) checkMedia(e []message.IMessageElement, urlOnly bool) {
 	for _, elem := range e {
 		switch i := elem.(type) {
 		case *message.ShortVideoElement:
-			filename := hex.EncodeToString(i.Md5) + ".video"
-			if !global.PathExists(path.Join(global.VideoPath, filename)) {
-				_ = ioutil.WriteFile(path.Join(global.VideoPath, filename), binary.NewWriterF(func(w *binary.Writer) {
-					w.Write(i.Md5)
-					w.Write(i.ThumbMd5)
-					w.WriteUInt32(uint32(i.Size))
-					w.WriteUInt32(uint32(i.ThumbSize))
-					w.WriteString(i.Name)
-					w.Write(i.Uuid)
-				}), 0644)
+			if !urlOnly {
+				filename := hex.EncodeToString(i.Md5) + ".video"
+				if !global.PathExists(path.Join(global.VideoPath, filename)) {
+					_ = ioutil.WriteFile(path.Join(global.VideoPath, filename), binary.NewWriterF(func(w *binary.Writer) {
+						w.Write(i.Md5)
+						w.Write(i.ThumbMd5)
+						w.WriteUInt32(uint32(i.Size))
+						w.WriteUInt32(uint32(i.ThumbSize))
+						w.WriteString(i.Name)
+						w.Write(i.Uuid)
+					}), 0644)
+				}
+				i.Name = filename
 			}
-			i.Name = filename
 			i.Url = bot.Client.GetShortVideoUrl(i.Uuid, i.Md5)
 		}
 	}
