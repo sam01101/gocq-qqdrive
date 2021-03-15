@@ -2,9 +2,9 @@ package coolq
 
 import (
 	"encoding/hex"
-	"github.com/Mrs4s/MiraiGo/binary"
-	"github.com/Mrs4s/MiraiGo/message"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/MiraiGo-qdrive/binary"
+	"github.com/sam01101/MiraiGo-qdrive/message"
+	"github.com/sam01101/gocq-qqdrive/global"
 	"io/ioutil"
 	"path"
 )

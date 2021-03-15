@@ -8,10 +8,10 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/Mrs4s/MiraiGo/client"
-	"github.com/Mrs4s/MiraiGo/message"
-	"github.com/Mrs4s/MiraiGo/utils"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/MiraiGo-qdrive/client"
+	"github.com/sam01101/MiraiGo-qdrive/message"
+	"github.com/sam01101/MiraiGo-qdrive/utils"
+	"github.com/sam01101/gocq-qqdrive/global"
 	jsoniter "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
 )

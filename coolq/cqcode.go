@@ -18,10 +18,10 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/Mrs4s/MiraiGo/binary"
-	"github.com/Mrs4s/MiraiGo/message"
-	"github.com/Mrs4s/MiraiGo/utils"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/MiraiGo-qdrive/binary"
+	"github.com/sam01101/MiraiGo-qdrive/message"
+	"github.com/sam01101/MiraiGo-qdrive/utils"
+	"github.com/sam01101/gocq-qqdrive/global"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )

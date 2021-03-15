@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mrs4s/go-cqhttp/coolq"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/gocq-qqdrive/coolq"
+	"github.com/sam01101/gocq-qqdrive/global"
 	"github.com/gin-gonic/gin"
 	"github.com/guonaihong/gout"
 	"github.com/guonaihong/gout/dataflow"

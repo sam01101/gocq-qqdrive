@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/Mrs4s/MiraiGo/binary"
-	"github.com/Mrs4s/MiraiGo/message"
+	"github.com/sam01101/MiraiGo-qdrive/binary"
+	"github.com/sam01101/MiraiGo-qdrive/message"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"os"
@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/gocq-qqdrive/global"
 	log "github.com/sirupsen/logrus"
 )
 

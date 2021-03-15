@@ -1,9 +1,8 @@
-module github.com/Mrs4s/go-cqhttp
+module github.com/sam01101/gocq-qqdrive
 
 go 1.16
 
 require (
-	github.com/Mrs4s/MiraiGo v0.0.0-20210315005315-55aef1b0ffd0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.6.3

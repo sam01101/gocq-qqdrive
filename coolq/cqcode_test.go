@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Mrs4s/MiraiGo/client"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/MiraiGo-qdrive/client"
+	"github.com/sam01101/gocq-qqdrive/global"
 )
 
 var bot = NewQQBot(client.NewClient(1, ""), global.DefaultConfig())

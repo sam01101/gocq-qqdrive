@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Mrs4s/go-cqhttp/coolq"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/gocq-qqdrive/coolq"
+	"github.com/sam01101/gocq-qqdrive/global"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"

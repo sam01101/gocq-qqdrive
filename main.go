@@ -24,16 +24,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Mrs4s/go-cqhttp/server"
+	"github.com/sam01101/gocq-qqdrive/server"
 	"github.com/guonaihong/gout"
 	"github.com/tidwall/gjson"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/term"
 
-	"github.com/Mrs4s/MiraiGo/binary"
-	"github.com/Mrs4s/MiraiGo/client"
-	"github.com/Mrs4s/go-cqhttp/coolq"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/MiraiGo-qdrive/binary"
+	"github.com/sam01101/MiraiGo-qdrive/client"
+	"github.com/sam01101/gocq-qqdrive/coolq"
+	"github.com/sam01101/gocq-qqdrive/global"
 	jsoniter "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
 )

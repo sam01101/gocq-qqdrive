@@ -15,12 +15,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Mrs4s/MiraiGo/utils"
+	"github.com/sam01101/MiraiGo-qdrive/utils"
 	"github.com/gin-contrib/pprof"
 
-	"github.com/Mrs4s/MiraiGo/client"
-	"github.com/Mrs4s/go-cqhttp/coolq"
-	"github.com/Mrs4s/go-cqhttp/global"
+	"github.com/sam01101/MiraiGo-qdrive/client"
+	"github.com/sam01101/gocq-qqdrive/coolq"
+	"github.com/sam01101/gocq-qqdrive/global"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
@@ -155,7 +155,7 @@ func (s *webServer) logincore(relogin bool) {
 			log.Warnf("1. 自行抓包. (推荐)")
 			log.Warnf("2. 使用Cef自动处理.")
 			log.Warnf("3. 不提交滑块并继续.(可能会导致上网环境异常错误)")
-			log.Warnf("详细信息请参考文档 -> https://github.com/Mrs4s/go-cqhttp/blob/master/docs/slider.md <-")
+			log.Warnf("详细信息请参考文档 -> https://github.com/sam01101/gocq-qqdrive/blob/master/docs/slider.md <-")
 			if s.Conf.WebUI != nil && s.Conf.WebUI.WebInput {
 				log.Warnf("请输入(1 - 3)： (http://%s:%d/admin/do_web_write 输入)", s.Conf.WebUI.Host, s.Conf.WebUI.WebUIPort)
 				text = <-WebInput

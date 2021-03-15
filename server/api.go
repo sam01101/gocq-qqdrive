@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/Mrs4s/go-cqhttp/coolq"
+	"github.com/sam01101/gocq-qqdrive/coolq"
 	"github.com/tidwall/gjson"
 	"strings"
 )
