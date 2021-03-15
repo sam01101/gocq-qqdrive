@@ -270,7 +270,7 @@ func main() {
 	c := server.Console
 	r := server.Restart
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	if r != nil {
+	for range r {
 		log.Info("正在重启中...")
 		restart(arg)
 	}
