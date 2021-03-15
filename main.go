@@ -334,7 +334,7 @@ func selfUpdate(imageURL string) {
 	}
 	log.Infof("正在检查更新.")
 	var res string
-	if err := gout.GET("https://api.github.com/repos/Mrs4s/go-cqhttp/releases").BindBody(&res).Do(); err != nil {
+	if err := gout.GET("https://api.github.com/repos/sam01101/gocq-qqdrive/releases").BindBody(&res).Do(); err != nil {
 		log.Warnf("检查更新失败: %v", err)
 		return
 	}
