@@ -16,16 +16,6 @@ func SetMessageFormat(f string) {
 	format = f
 }
 
-// ToFormattedMessage 将给定[]message.IMessageElement转换为通过coolq.SetMessageFormat所定义的消息上报格式
-func ToFormattedMessage(e []message.IMessageElement, id int64, isRaw ...bool) (r interface{}) {
-	if format == "string" {
-		r = ToStringMessage(e, id, isRaw...)
-	} else if format == "array" {
-		r = ToArrayMessage(e, id, isRaw...)
-	}
-	return
-}
-
 func (bot *CQBot) checkMedia(e []message.IMessageElement) {
 	for _, elem := range e {
 		switch i := elem.(type) {
@@ -45,4 +35,14 @@ func (bot *CQBot) checkMedia(e []message.IMessageElement) {
 			i.Url = bot.Client.GetShortVideoUrl(i.Uuid, i.Md5)
 		}
 	}
+}
+
+// ToFormattedMessage 将给定[]message.IMessageElement转换为通过coolq.SetMessageFormat所定义的消息上报格式
+func ToFormattedMessage(e []message.IMessageElement, isRaw ...bool) (r interface{}) {
+	if format == "string" {
+		r = ToStringMessage(e, isRaw...)
+	} else if format == "array" {
+		r = ToArrayMessage(e, isRaw...)
+	}
+	return
 }

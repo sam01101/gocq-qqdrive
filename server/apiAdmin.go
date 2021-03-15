@@ -295,7 +295,6 @@ func (s *webServer) logincore(relogin bool) {
 		if relogin {
 			if times > s.Conf.ReLogin.MaxReloginTimes && s.Conf.ReLogin.MaxReloginTimes != 0 {
 				log.Fatal("重连失败: 重连次数达到设置的上限值")
-				s.bot.Release()
 				return
 			}
 			log.Warnf("将在 %v 秒后尝试重连. 重连次数：%v", s.Conf.ReLogin.ReLoginDelay, times)
@@ -316,9 +315,6 @@ func (s *webServer) Dologin() {
 	s.Cli.AllowSlider = true
 	s.logincore(false)
 	log.Infof("登录成功 欢迎使用: %v", s.Cli.Nickname)
-	log.Infof("开始加载群列表...")
-	global.Check(s.Cli.ReloadGroupList())
-	log.Infof("共加载 %v 个群.", len(s.Cli.GroupList))
 	s.bot = coolq.NewQQBot(s.Cli, s.Conf)
 	if s.Conf.PostMessageFormat != "string" && s.Conf.PostMessageFormat != "array" {
 		log.Warnf("post_message_format 配置错误, 将自动使用 string")
@@ -331,7 +327,6 @@ func (s *webServer) Dologin() {
 	}
 	coolq.IgnoreInvalidCQCode = s.Conf.IgnoreInvalidCQCode
 	coolq.SplitURL = s.Conf.FixURL
-	coolq.ForceFragmented = s.Conf.ForceFragmented
 	log.Info("资源初始化完成, 开始处理信息.")
 	log.Info("アトリは、高性能ですから!")
 
@@ -500,7 +495,6 @@ func (s *webServer) ReloadServer() {
 
 // AdminDoRestart 热重启
 func AdminDoRestart(s *webServer, c *gin.Context) {
-	s.bot.Release()
 	s.bot = nil
 	s.Cli = nil
 	s.DoReLogin()

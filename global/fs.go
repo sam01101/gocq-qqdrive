@@ -47,13 +47,6 @@ func WriteAllText(path, text string) error {
 	return ioutil.WriteFile(path, []byte(text), 0644)
 }
 
-// Check 检测err是否为nil
-func Check(err error) {
-	if err != nil {
-		log.Fatalf("遇到错误: %v", err)
-	}
-}
-
 // DelFile 删除一个给定path，并返回删除结果
 func DelFile(path string) bool {
 	err := os.Remove(path)

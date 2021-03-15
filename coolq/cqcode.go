@@ -16,7 +16,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 	"unsafe"
 
 	"github.com/Mrs4s/MiraiGo/binary"
@@ -69,22 +68,11 @@ type LocalVideoElement struct {
 }
 
 // ToArrayMessage 将消息元素数组转为MSG数组以用于消息上报
-func ToArrayMessage(e []message.IMessageElement, id int64, isRaw ...bool) (r []MSG) {
+func ToArrayMessage(e []message.IMessageElement, isRaw ...bool) (r []MSG) {
 	r = []MSG{}
 	ur := false
 	if len(isRaw) != 0 {
 		ur = isRaw[0]
-	}
-	m := &message.SendingMessage{Elements: e}
-	reply := m.FirstOrNil(func(e message.IMessageElement) bool {
-		_, ok := e.(*message.ReplyElement)
-		return ok
-	})
-	if reply != nil {
-		r = append(r, MSG{
-			"type": "reply",
-			"data": map[string]string{"id": fmt.Sprint(toGlobalID(id, reply.(*message.ReplyElement).ReplySeq))},
-		})
 	}
 	for _, elem := range e {
 		var m MSG
@@ -94,53 +82,10 @@ func ToArrayMessage(e []message.IMessageElement, id int64, isRaw ...bool) (r []M
 				"type": "text",
 				"data": map[string]string{"text": o.Content},
 			}
-		case *message.LightAppElement:
-			// m = MSG{
-			// 	"type": "text",
-			// 	"data": map[string]string{"text": o.Content},
-			// }
-			m = MSG{
-				"type": "json",
-				"data": map[string]string{"data": o.Content},
-			}
-		case *message.AtElement:
-			if o.Target == 0 {
-				m = MSG{
-					"type": "at",
-					"data": map[string]string{"qq": "all"},
-				}
-			} else {
-				m = MSG{
-					"type": "at",
-					"data": map[string]string{"qq": fmt.Sprint(o.Target)},
-				}
-			}
-		case *message.RedBagElement:
-			m = MSG{
-				"type": "redbag",
-				"data": map[string]string{"title": o.Title},
-			}
 		case *message.ForwardElement:
 			m = MSG{
 				"type": "forward",
 				"data": map[string]string{"id": o.ResId},
-			}
-		case *message.FaceElement:
-			m = MSG{
-				"type": "face",
-				"data": map[string]string{"id": fmt.Sprint(o.Index)},
-			}
-		case *message.VoiceElement:
-			if ur {
-				m = MSG{
-					"type": "record",
-					"data": map[string]string{"file": o.Name},
-				}
-			} else {
-				m = MSG{
-					"type": "record",
-					"data": map[string]string{"file": o.Name, "url": o.Url},
-				}
 			}
 		case *message.ShortVideoElement:
 			if ur {
@@ -152,64 +97,6 @@ func ToArrayMessage(e []message.IMessageElement, id int64, isRaw ...bool) (r []M
 				m = MSG{
 					"type": "video",
 					"data": map[string]string{"file": o.Name, "url": o.Url},
-				}
-			}
-		case *message.ImageElement:
-			if ur {
-				m = MSG{
-					"type": "image",
-					"data": map[string]string{"file": o.Filename},
-				}
-			} else {
-				m = MSG{
-					"type": "image",
-					"data": map[string]string{"file": o.Filename, "url": o.Url},
-				}
-			}
-		case *message.GroupImageElement:
-			if ur {
-				m = MSG{
-					"type": "image",
-					"data": map[string]string{"file": hex.EncodeToString(o.Md5) + ".image"},
-				}
-			} else {
-				m = MSG{
-					"type": "image",
-					"data": map[string]string{"file": hex.EncodeToString(o.Md5) + ".image", "url": CQCodeEscapeText(o.Url)},
-				}
-			}
-		case *message.FriendImageElement:
-			if ur {
-				m = MSG{
-					"type": "image",
-					"data": map[string]string{"file": hex.EncodeToString(o.Md5) + ".image"},
-				}
-			} else {
-				m = MSG{
-					"type": "image",
-					"data": map[string]string{"file": hex.EncodeToString(o.Md5) + ".image", "url": CQCodeEscapeText(o.Url)},
-				}
-			}
-		case *message.GroupFlashImgElement:
-			return []MSG{{
-				"type": "image",
-				"data": map[string]string{"file": o.Filename, "type": "flash"},
-			}}
-		case *message.FriendFlashImgElement:
-			return []MSG{{
-				"type": "image",
-				"data": map[string]string{"file": o.Filename, "type": "flash"},
-			}}
-		case *message.ServiceElement:
-			if isOk := strings.Contains(o.Content, "<?xml"); isOk {
-				m = MSG{
-					"type": "xml",
-					"data": map[string]string{"data": o.Content, "resid": fmt.Sprintf("%d", o.Id)},
-				}
-			} else {
-				m = MSG{
-					"type": "json",
-					"data": map[string]string{"data": o.Content, "resid": fmt.Sprintf("%d", o.Id)},
 				}
 			}
 		default:
@@ -221,79 +108,23 @@ func ToArrayMessage(e []message.IMessageElement, id int64, isRaw ...bool) (r []M
 }
 
 // ToStringMessage 将消息元素数组转为字符串以用于消息上报
-func ToStringMessage(e []message.IMessageElement, id int64, isRaw ...bool) (r string) {
+func ToStringMessage(e []message.IMessageElement, isRaw ...bool) (r string) {
 	ur := false
 	if len(isRaw) != 0 {
 		ur = isRaw[0]
-	}
-	// 方便
-	m := &message.SendingMessage{Elements: e}
-	reply := m.FirstOrNil(func(e message.IMessageElement) bool {
-		_, ok := e.(*message.ReplyElement)
-		return ok
-	})
-	if reply != nil {
-		r += fmt.Sprintf("[CQ:reply,id=%d]", toGlobalID(id, reply.(*message.ReplyElement).ReplySeq))
 	}
 	for _, elem := range e {
 		switch o := elem.(type) {
 		case *message.TextElement:
 			r += CQCodeEscapeText(o.Content)
-		case *message.AtElement:
-			if o.Target == 0 {
-				r += "[CQ:at,qq=all]"
-				continue
-			}
-			r += fmt.Sprintf("[CQ:at,qq=%d]", o.Target)
-		case *message.RedBagElement:
-			r += fmt.Sprintf("[CQ:redbag,title=%s]", o.Title)
 		case *message.ForwardElement:
 			r += fmt.Sprintf("[CQ:forward,id=%s]", o.ResId)
-		case *message.FaceElement:
-			r += fmt.Sprintf(`[CQ:face,id=%d]`, o.Index)
-		case *message.VoiceElement:
-			if ur {
-				r += fmt.Sprintf(`[CQ:record,file=%s]`, o.Name)
-			} else {
-				r += fmt.Sprintf(`[CQ:record,file=%s,url=%s]`, o.Name, CQCodeEscapeValue(o.Url))
-			}
 		case *message.ShortVideoElement:
 			if ur {
 				r += fmt.Sprintf(`[CQ:video,file=%s]`, o.Name)
 			} else {
 				r += fmt.Sprintf(`[CQ:video,file=%s,url=%s]`, o.Name, CQCodeEscapeValue(o.Url))
 			}
-		case *message.ImageElement:
-			if ur {
-				r += fmt.Sprintf(`[CQ:image,file=%s]`, o.Filename)
-			} else {
-				r += fmt.Sprintf(`[CQ:image,file=%s,url=%s]`, o.Filename, CQCodeEscapeValue(o.Url))
-			}
-		case *message.GroupImageElement:
-			if ur {
-				r += fmt.Sprintf("[CQ:image,file=%s]", hex.EncodeToString(o.Md5)+".image")
-			} else {
-				r += fmt.Sprintf("[CQ:image,file=%s,url=%s]", hex.EncodeToString(o.Md5)+".image", CQCodeEscapeText(o.Url))
-			}
-		case *message.FriendImageElement:
-			if ur {
-				r += fmt.Sprintf("[CQ:image,file=%s]", hex.EncodeToString(o.Md5)+".image")
-			} else {
-				r += fmt.Sprintf("[CQ:image,file=%s,url=%s]", hex.EncodeToString(o.Md5)+".image", CQCodeEscapeText(o.Url))
-			}
-		case *message.GroupFlashImgElement:
-			return fmt.Sprintf("[CQ:image,type=flash,file=%s]", o.Filename)
-		case *message.FriendFlashImgElement:
-			return fmt.Sprintf("[CQ:image,type=flash,file=%s]", o.Filename)
-		case *message.ServiceElement:
-			if isOk := strings.Contains(o.Content, "<?xml"); isOk {
-				r += fmt.Sprintf(`[CQ:xml,data=%s,resid=%d]`, CQCodeEscapeValue(o.Content), o.Id)
-			} else {
-				r += fmt.Sprintf(`[CQ:json,data=%s,resid=%d]`, CQCodeEscapeValue(o.Content), o.Id)
-			}
-		case *message.LightAppElement:
-			r += fmt.Sprintf(`[CQ:json,data=%s]`, CQCodeEscapeValue(o.Content))
-			// r += CQCodeEscapeText(o.Content)
 		}
 	}
 	return
@@ -308,37 +139,6 @@ func (bot *CQBot) ConvertStringMessage(s string, isGroup bool) (r []message.IMes
 	i, j, CQBegin := 0, 0, 0
 
 	saveCQCode := func() {
-		if t == "reply" { // reply 特殊处理
-			if len(r) > 0 {
-				if _, ok := r[0].(*message.ReplyElement); ok {
-					log.Warnf("警告: 一条信息只能包含一个 Reply 元素.")
-					return
-				}
-			}
-			customText := d["text"]
-			sender, err := strconv.ParseInt(d["qq"], 10, 64)
-			if err != nil {
-				log.Warnf("警告:自定义 Reply 元素中必须包含 Uin")
-				return
-			}
-			msgTime, err := strconv.ParseInt(d["time"], 10, 64)
-			if err != nil {
-				msgTime = time.Now().Unix()
-			}
-			messageSeq, err := strconv.ParseInt(d["seq"], 10, 64)
-			if err != nil {
-				messageSeq = 0
-			}
-			r = append([]message.IMessageElement{
-				&message.ReplyElement{
-					ReplySeq: int32(messageSeq),
-					Sender:   sender,
-					Time:     int32(msgTime),
-					Elements: bot.ConvertStringMessage(customText, isGroup),
-				},
-			}, r...)
-			return
-		}
 		if t == "forward" { // 单独处理转发
 			if id, ok := d["id"]; ok {
 				r = []message.IMessageElement{bot.Client.DownloadForwardMessage(id)}
@@ -436,37 +236,6 @@ End:
 func (bot *CQBot) ConvertObjectMessage(m gjson.Result, isGroup bool) (r []message.IMessageElement) {
 	convertElem := func(e gjson.Result) {
 		t := e.Get("type").Str
-		if t == "reply" && isGroup {
-			if len(r) > 0 {
-				if _, ok := r[0].(*message.ReplyElement); ok {
-					log.Warnf("警告: 一条信息只能包含一个 Reply 元素.")
-					return
-				}
-			}
-			customText := e.Get("data").Get("text").String()
-			sender, err := strconv.ParseInt(e.Get("data").Get("qq").String(), 10, 64)
-			if err != nil {
-				log.Warnf("警告:自定义 Reply 元素中必须包含 Uin")
-				return
-			}
-			msgTime, err := strconv.ParseInt(e.Get("data").Get("time").String(), 10, 64)
-			if err != nil {
-				msgTime = time.Now().Unix()
-			}
-			messageSeq, err := strconv.ParseInt(e.Get("data").Get("seq").String(), 10, 64)
-			if err != nil {
-				messageSeq = 0
-			}
-			r = append([]message.IMessageElement{
-				&message.ReplyElement{
-					ReplySeq: int32(messageSeq),
-					Sender:   sender,
-					Time:     int32(msgTime),
-					Elements: bot.ConvertStringMessage(customText, isGroup),
-				},
-			}, r...)
-			return
-		}
 		if t == "forward" {
 			r = []message.IMessageElement{bot.Client.DownloadForwardMessage(e.Get("data.id").String())}
 			return

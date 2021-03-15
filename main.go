@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"github.com/Mrs4s/go-cqhttp/global/terminal"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 	"io"
@@ -129,11 +128,6 @@ func main() {
 				isFastStart = true
 			}
 		}
-	}
-	if terminal.RunningByDoubleClick() && !isFastStart {
-		log.Warning("警告: 强烈不推荐通过双击直接运行本程序, 这将导致一些非预料的后果.")
-		//log.Warning("将等待10s后启动")
-		//time.Sleep(time.Second * 10)
 	}
 	if conf.Uin == 0 || (conf.Password == "" && conf.PasswordEncrypted == "") {
 		log.Warnf("请修改 config.hjson 以添加账号密码.")
@@ -272,16 +266,13 @@ func main() {
 		conf.WebUI.Host = "127.0.0.1"
 	}
 	global.Proxy = conf.ProxyRewrite
-	b := server.WebServer.Run(fmt.Sprintf("%s:%d", conf.WebUI.Host, conf.WebUI.WebUIPort), cli)
+	server.WebServer.Run(fmt.Sprintf("%s:%d", conf.WebUI.Host, conf.WebUI.WebUIPort), cli)
 	c := server.Console
 	r := server.Restart
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	select {
-	case <-c:
-		b.Release()
 	case <-r:
 		log.Info("正在重启中...")
-		defer b.Release()
 		restart(arg)
 	}
 }

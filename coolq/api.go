@@ -184,7 +184,7 @@ func (bot *CQBot) CQGetForwardMessage(resID string) MSG {
 				"nickname": n.SenderName,
 			},
 			"time":    n.Time,
-			"content": ToFormattedMessage(n.Message, 0, false),
+			"content": ToFormattedMessage(n.Message, false),
 		})
 	}
 	return OK(MSG{
