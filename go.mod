@@ -20,7 +20,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315180240-999c479dc011
+	github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316154032-af45519709e3
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
@@ -39,4 +39,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
 
-replace github.com/sam01101/MiraiGo-qdrive => D:\MiraiGo-qdrive
+//replace github.com/sam01101/MiraiGo-qdrive => D:\MiraiGo-qdrive
