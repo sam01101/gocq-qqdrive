@@ -131,7 +131,7 @@ func ToStringMessage(e []message.IMessageElement, isRaw ...bool) (r string) {
 }
 
 // ConvertStringMessage 将消息字符串转为消息元素数组
-func (bot *CQBot) ConvertStringMessage(s string, isGroup bool) (r []message.IMessageElement) {
+func (bot *CQBot) ConvertStringMessage(s string, _ bool) (r []message.IMessageElement) {
 	var t, key string
 	var d = map[string]string{}
 	ptr := unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&s)).Data)

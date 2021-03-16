@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/sam01101/gocq-qqdrive/coolq"
 	"github.com/sam01101/gocq-qqdrive/global"
-	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
