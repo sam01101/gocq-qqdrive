@@ -107,6 +107,8 @@ github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315180240-999c479dc011 h1:vWgKess
 github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315180240-999c479dc011/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
 github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316154032-af45519709e3 h1:RaeJBr0YbmN6xGTMT89PA5jGroYOkE4QWi/Yyo9yysY=
 github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316154032-af45519709e3/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
+github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316161652-6614133ed8d8 h1:JqcbHdnVf1CLAC8QSGQe+0pc8X/62I45cXL/Q6OHlhk=
+github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316161652-6614133ed8d8/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=

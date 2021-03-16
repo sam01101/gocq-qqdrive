@@ -20,7 +20,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316154032-af45519709e3
+	github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316161652-6614133ed8d8
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
