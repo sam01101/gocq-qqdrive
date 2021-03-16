@@ -167,8 +167,6 @@ func (bot *CQBot) CQSendGroupForwardMessage(m gjson.Result) MSG {
 	return Failed(100)
 }
 
-
-
 // CQGetForwardMessage 获取合并转发消息
 //
 // https://git.io/Jtz1F
@@ -178,11 +176,19 @@ func (bot *CQBot) CQGetForwardMessage(resID string) MSG {
 		return Failed(100, "MSG_NOT_FOUND", "消息不存在")
 	}
 	r := make([]MSG, 0)
+	// Send all request first, then get from store after
+	for _, n := range m.Nodes {
+		bot.checkMedia(n.Message, false)
+		time.Sleep(time.Millisecond)
+	}
+	time.Sleep(time.Second * 2)
 	for _, n := range m.Nodes {
 		bot.checkMedia(n.Message, true)
+	}
+	for _, n := range m.Nodes {
 		r = append(r, MSG{
 			"sender": MSG{
-				"user_id":  n.SenderId,
+				"user_id": n.SenderId,
 			},
 			"content": ToFormattedMessage(n.Message, false),
 		})

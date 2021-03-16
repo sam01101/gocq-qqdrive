@@ -1,12 +1,8 @@
 package coolq
 
 import (
-	"encoding/hex"
-	"github.com/sam01101/MiraiGo-qdrive/binary"
 	"github.com/sam01101/MiraiGo-qdrive/message"
-	"github.com/sam01101/gocq-qqdrive/global"
-	"io/ioutil"
-	"path"
+	log "github.com/sirupsen/logrus"
 )
 
 var format = "string"
@@ -16,25 +12,21 @@ func SetMessageFormat(f string) {
 	format = f
 }
 
-func (bot *CQBot) checkMedia(e []message.IMessageElement, urlOnly bool) {
+func (bot *CQBot) checkMedia(e []message.IMessageElement, getFromSeq bool) {
 	for _, elem := range e {
 		switch i := elem.(type) {
 		case *message.ShortVideoElement:
-			if !urlOnly {
-				filename := hex.EncodeToString(i.Md5) + ".video"
-				if !global.PathExists(path.Join(global.VideoPath, filename)) {
-					_ = ioutil.WriteFile(path.Join(global.VideoPath, filename), binary.NewWriterF(func(w *binary.Writer) {
-						w.Write(i.Md5)
-						w.Write(i.ThumbMd5)
-						w.WriteUInt32(uint32(i.Size))
-						w.WriteUInt32(uint32(i.ThumbSize))
-						w.WriteString(i.Name)
-						w.Write(i.Uuid)
-					}), 0644)
+			if getFromSeq {
+				url, err := bot.Client.GetSeq(i.Seq)
+				if err != nil {
+					log.Errorf("Error while getting short video url: %v", err)
+					i.Url = ""
+				} else {
+					i.Url = url.(string)
 				}
-				i.Name = filename
+			} else {
+				i.Seq = bot.Client.GetShortVideoUrlSeq(i.Uuid, i.Md5)
 			}
-			i.Url = bot.Client.GetShortVideoUrl(i.Uuid, i.Md5)
 		}
 	}
 }
