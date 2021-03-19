@@ -101,14 +101,8 @@ github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315163102-2ce76f37ebd5 h1:ZP6wMI5T9lKa1Mw2deHadWrnECJIAjETU6j0tHITZwg=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315163102-2ce76f37ebd5/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315180240-999c479dc011 h1:vWgKess1ikpkTOmLBrifH75iJZYbBpOoilQAxJOpa38=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210315180240-999c479dc011/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316154032-af45519709e3 h1:RaeJBr0YbmN6xGTMT89PA5jGroYOkE4QWi/Yyo9yysY=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316154032-af45519709e3/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316161652-6614133ed8d8 h1:JqcbHdnVf1CLAC8QSGQe+0pc8X/62I45cXL/Q6OHlhk=
-github.com/sam01101/MiraiGo-qdrive v0.0.0-20210316161652-6614133ed8d8/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
+github.com/sam01101/MiraiGo-qdrive v0.0.0-20210319074648-bbbdf5f50c85 h1:9q4UuCrDIQRrRxRSjfYH7WXShy5gs+IF9jmqCnH3v/U=
+github.com/sam01101/MiraiGo-qdrive v0.0.0-20210319074648-bbbdf5f50c85/go.mod h1:JMl50kEkO/QYM3pCOo97eY0kmmy9lGiHwVHwYNj5fb0=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
@@ -154,8 +148,6 @@ golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn
 golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 h1:qWPm9rbaAMKs8Bq/9LRpbMqxWRVUAQwMI9fVrssnTfw=
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
-golang.org/x/net v0.0.0-20210315170653-34ac3e1c2000 h1:6mqyFav9MzRNys8OnKlbKYSJxsoVvhb773Si3bu5fYE=
-golang.org/x/net v0.0.0-20210315170653-34ac3e1c2000/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4 h1:b0LrWgu8+q7z4J+0Y3Umo5q1dL7NXBkKBWkaVkAq17E=
 golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4/go.mod h1:RBQZq4jEuRlivfhVLdyRGr576XBO4/greRjx4P4O3yc=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
