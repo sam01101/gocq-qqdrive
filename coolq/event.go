@@ -2,7 +2,6 @@ package coolq
 
 import (
 	"github.com/sam01101/MiraiGo-qdrive/message"
-	log "github.com/sirupsen/logrus"
 )
 
 var format = "string"
@@ -12,21 +11,11 @@ func SetMessageFormat(f string) {
 	format = f
 }
 
-func (bot *CQBot) checkMedia(e []message.IMessageElement, getFromSeq bool) {
+func (bot *CQBot) checkMedia(e []message.IMessageElement) {
 	for _, elem := range e {
 		switch i := elem.(type) {
 		case *message.ShortVideoElement:
-			if getFromSeq {
-				url, err := bot.Client.GetSeq(i.Seq)
-				if err != nil {
-					log.Errorf("Error while getting short video url: %v", err)
-					i.Url = ""
-				} else {
-					i.Url = url.(string)
-				}
-			} else {
-				i.Seq = bot.Client.GetShortVideoUrlSeq(i.Uuid, i.Md5)
-			}
+			i.Url = bot.Client.GetShortVideoUrl(i.Uuid, i.Md5)
 		}
 	}
 }

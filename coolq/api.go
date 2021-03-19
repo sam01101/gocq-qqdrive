@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/sam01101/gocq-qqdrive/global"
@@ -176,15 +177,16 @@ func (bot *CQBot) CQGetForwardMessage(resID string) MSG {
 		return Failed(100, "MSG_NOT_FOUND", "消息不存在")
 	}
 	r := make([]MSG, 0)
-	// Send all request first, then get from store after
+	// Split out request
+	wg := sync.WaitGroup{}
+	wg.Add(len(m.Nodes))
 	for _, n := range m.Nodes {
-		bot.checkMedia(n.Message, false)
-		time.Sleep(time.Millisecond)
+		go func(n *message.ForwardNode) {
+			bot.checkMedia(n.Message)
+			wg.Done()
+		}(n)
 	}
-	time.Sleep(time.Second * 2)
-	for _, n := range m.Nodes {
-		bot.checkMedia(n.Message, true)
-	}
+	wg.Wait()
 	for _, n := range m.Nodes {
 		r = append(r, MSG{
 			"sender": MSG{
